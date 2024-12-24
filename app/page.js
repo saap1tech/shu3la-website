@@ -124,7 +124,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row justify-center space-y-6 md:space-y-0 md:space-x-8">
             {/* Windows Download */}
             <motion.a
-              href="/download/شعلة_001.exe"
+              href="/download/شعلة.exe"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="bg-white border-2 border-[#0064E0] text-[#0064E0] px-10 py-6 rounded-lg shadow-lg hover:bg-[#0064E0] hover:text-white transition-all duration-300 flex items-center justify-center space-x-4"
