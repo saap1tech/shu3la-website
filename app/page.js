@@ -211,7 +211,7 @@ export default function Home() {
             <div className="w-full md:w-1/3">
               <h4 className="text-lg font-semibold mb-4">تواصل معنا</h4>
               <p className="text-sm mb-2">
-                البريد الإلكتروني: support@shu3la.com
+                البريد الإلكتروني: shu3la.project@gmail.com
               </p>
             </div>
           </div>
