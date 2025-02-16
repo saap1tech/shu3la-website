@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import {
   FaBook,
   FaBrain,
@@ -12,6 +12,7 @@ import {
 import { motion } from "framer-motion";
 import AOS from "aos";
 import "aos/dist/aos.css";
+import emailjs from "@emailjs/browser";
 
 export default function Home() {
   const psychologicalFeatures = [
@@ -48,6 +49,54 @@ export default function Home() {
       AOS.refresh();
     };
   }, []);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [selectedOS, setSelectedOS] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
+
+  const handleDownloadClick = (os) => {
+    setSelectedOS(os);
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const serviceId = "service_cxe9xkf";
+    const templateId = "template_xa5mcwo";
+    const publicKey = "q-2f8EpCG8onOfpD-";
+
+    const templateParams = {
+      from_email: email,
+      to_name: "تحميل شعلة",
+      message: `{
+        "Full Name": "${fullName}",
+        "Email": "${email}",
+        "OS": "${selectedOS}",
+      }`,
+    };
+
+    try {
+      await emailjs.send(serviceId, templateId, templateParams, publicKey);
+      setSubmitStatus("success");
+      setIsModalOpen(false);
+      window.location.href =
+        selectedOS === "windows"
+          ? "/download/شعلة.exe"
+          : "/download/شعلة_macos.dmg";
+    } catch (error) {
+      console.error("Email sending error:", error);
+      setSubmitStatus("error");
+    } finally {
+      setFullName("")
+      setEmail("")
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div ref={container} className="bg-white text-gray-900 overflow-x-hidden">
@@ -144,38 +193,76 @@ export default function Home() {
             (النسخة التجريبية) حمّل شعلة الآن
           </h2>
           <div
-            ref={downloadRef}
             className="flex flex-col md:flex-row justify-center space-y-6 md:space-y-0 md:space-x-8"
             data-aos="fade-up"
-            data-aos-anchor-placement="top-bottom"
           >
-            <motion.a
-              href="/download/شعلة.exe"
+            <motion.button
+              onClick={() => handleDownloadClick("windows")}
               className="bg-white border-2 border-[#0064E0] text-[#0064E0] px-10 py-6 rounded-lg shadow-lg hover:bg-[#0064E0] hover:text-white transition-all duration-300 flex items-center justify-center space-x-4"
               whileHover={{ scale: 1.1 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              aria-label="تحميل للويندوز"
             >
               <FaWindows className="h-8 w-8" />
               <span className="text-lg font-semibold">تحميل للويندوز</span>
-            </motion.a>
+            </motion.button>
 
-            <motion.a
-              href="/download/شعلة_macos.dmg"
+            <motion.button
+              onClick={() => handleDownloadClick("mac")}
               className="bg-white border-2 border-[#FF8B04] text-[#FF8B04] px-10 py-6 rounded-lg shadow-lg hover:bg-[#FF8B04] hover:text-white transition-all duration-300 flex items-center justify-center space-x-4"
               whileHover={{ scale: 1.1 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
-              aria-label="تحميل للماك"
             >
               <FaApple className="h-8 w-8" />
               <span className="text-lg font-semibold">تحميل للماك</span>
-            </motion.a>
+            </motion.button>
           </div>
           <p className="mt-8 text-gray-600 max-w-2xl mx-auto">
             شعلة متوفر حصريًا على أجهزة الحاسوب الشخصية لتوفير تجربة تعلم مثالية
             لطلاب البكالوريا
           </p>
         </div>
+
+        {isModalOpen && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-96 text-center">
+              <h3 className="text-xl font-semibold mb-4">
+                أدخل معلوماتك للتحميل
+              </h3>
+              <form onSubmit={handleSubmit}>
+                <input
+                  type="text"
+                  className="w-full p-2 border border-gray-300 rounded mb-4"
+                  placeholder="أدخل الاسم واللقب"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
+                <input
+                  type="email"
+                  className="w-full p-2 border border-gray-300 rounded mb-4"
+                  placeholder="أدخل بريدك الإلكتروني"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <div className="flex justify-between">
+                  <button
+                    type="submit"
+                    className="bg-[#0064E0] text-white px-4 py-2 rounded hover:bg-[#004bb8] transition"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "جاري التحميل..." : "تحميل"}
+                  </button>
+                  <button
+                    type="button"
+                    className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 transition"
+                    onClick={() => setIsModalOpen(false)}
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Footer */}
